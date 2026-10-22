@@ -5,6 +5,7 @@ import '../../../app/theme.dart';
 import '../../../data/profile_repository.dart';
 import '../../../domain/plan.dart';
 import '../../../l10n/strings.dart';
+import '../../../widgets/adaptive.dart';
 
 /// Copy deck: "{Plan} · {remaining} of {limit} scans left" or
 /// "{Plan} · Unlimited scans". Numbers are exactly what the server sent.
@@ -12,7 +13,8 @@ String quotaLabel(Quota q) => q.isUnlimited
     ? Strings.quotaChipUnlimited(q.planLabel)
     : Strings.quotaChip(q.planLabel, q.remaining, q.scanLimit);
 
-/// Plan + remaining scans chip on the Scan screen (design.md §4.4).
+/// Plan + remaining scans chip (handoff mockups: iOS pill on #F1F6F2 with a
+/// hairline, Android outlined chip), sparkle icon in primary.
 class QuotaChip extends ConsumerWidget {
   const QuotaChip({super.key});
 
@@ -23,61 +25,59 @@ class QuotaChip extends ConsumerWidget {
       AsyncData(:final value) => _chip(
           context,
           label: quotaLabel(value),
-          icon: value.isUnlimited ? Icons.all_inclusive : Icons.bolt,
           color: value.isExhausted ? AppColors.danger : AppColors.primary,
         ),
       AsyncError() => _chip(
           context,
           label: Strings.quotaUnavailable,
-          icon: Icons.refresh,
           color: AppColors.textMuted,
           onTap: () => ref.invalidate(quotaProvider),
           tooltip: Strings.retry,
         ),
-      _ => _chip(context, label: '…', icon: Icons.bolt, color: AppColors.textMuted),
+      _ => _chip(context, label: '…', color: AppColors.textMuted),
     };
   }
 
   Widget _chip(
     BuildContext context, {
     required String label,
-    required IconData icon,
     required Color color,
     VoidCallback? onTap,
     String? tooltip,
   }) {
+    final ios = isIos(context);
     final chip = Container(
-      constraints: const BoxConstraints(minHeight: 36),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      constraints: BoxConstraints(minHeight: ios ? 34 : 32),
+      padding: EdgeInsets.symmetric(horizontal: ios ? 12 : 12, vertical: ios ? 7 : 0),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
+        color: ios ? AppColors.surfaceMuted : Colors.transparent,
+        borderRadius: BorderRadius.circular(ios ? 999 : 8),
+        border: Border.all(color: ios ? AppColors.border : AppColors.borderStrong),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 6),
+          Icon(Icons.auto_awesome, size: ios ? 14 : 18, color: color),
+          SizedBox(width: ios ? 6 : 8),
           Flexible(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontFamily: AppFonts.body,
+                fontSize: ios ? 12 : 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.text,
+              ),
             ),
           ),
         ],
       ),
     );
-    final semantic = Semantics(
-      button: onTap != null,
-      label: label,
-      excludeSemantics: true,
-      child: chip,
-    );
+    final semantic = Semantics(button: onTap != null, label: label, excludeSemantics: true, child: chip);
     if (onTap == null) return semantic;
     return Tooltip(
       message: tooltip ?? '',
-      child: InkWell(borderRadius: BorderRadius.circular(999), onTap: onTap, child: semantic),
+      child: InkWell(borderRadius: BorderRadius.circular(ios ? 999 : 8), onTap: onTap, child: semantic),
     );
   }
 }

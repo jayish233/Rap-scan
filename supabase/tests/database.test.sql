@@ -1,7 +1,7 @@
 -- pgTAP tests for schema, RLS, quota and leaderboard. Run: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(25);
+select plan(27);
 
 -- Fixtures: three users created through auth (profiles come from the trigger).
 insert into auth.users (id, email) values
@@ -86,8 +86,10 @@ select '00000000-0000-0000-0000-00000000000c', 'ingredients', 90, '{}' from gene
 insert into public.consumption (id, user_id, scan_id, calories_kcal) values
   ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', '10000000-0000-0000-0000-000000000001', 120);
 
+-- Fixture users only, so leftover local data cannot affect the result.
 select results_eq(
-  $$ select username, avg_score, scan_count from public.get_leaderboard() $$,
+  $$ select username, avg_score, scan_count from public.get_leaderboard()
+     where username in ('alice_1', 'bob') $$,
   $$ values ('alice_1'::text, 74::numeric, 3::bigint) $$,
   'leaderboard: min 3 scans, username required, rounded average');
 
@@ -146,15 +148,31 @@ select throws_ok(
   '42501', null, 'cannot log consumption against another user''s scan');
 
 select results_eq(
-  $$ select count(*) from public.get_leaderboard() $$,
+  $$ select count(*) from public.get_leaderboard() where username = 'alice_1' $$,
   $$ values (1::bigint) $$,
   'leaderboard is callable by signed-in users');
 
 set local role anon;
 select results_eq(
-  $$ select count(*) from public.get_leaderboard() $$,
+  $$ select count(*) from public.get_leaderboard() where username = 'alice_1' $$,
   $$ values (1::bigint) $$,
   'leaderboard is public');
+
+-- consumption takes product name + calories from the scan, not the client.
+reset role;
+update public.scans set product_name = 'Curd', calories_kcal = 98 where id = '10000000-0000-0000-0000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a","role":"authenticated"}', true);
+insert into public.consumption (id, user_id, scan_id, product_name, calories_kcal)
+  values ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-00000000000a',
+          '10000000-0000-0000-0000-000000000001', 'Fake', 1);
+select is(
+  (select product_name || ':' || calories_kcal from public.consumption where id = '20000000-0000-0000-0000-000000000002'),
+  'Curd:98', 'consumption copies name and calories from the scan');
+select lives_ok(
+  $$ insert into public.consumption (user_id, scan_id) values
+     ('00000000-0000-0000-0000-00000000000a', '10000000-0000-0000-0000-000000000001') $$,
+  'the same scan can be logged again');
 
 select * from finish();
 rollback;

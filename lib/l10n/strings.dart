@@ -96,6 +96,11 @@ abstract final class Strings {
   static const needAccount = 'New to RAPscanz? Create an account';
   static const confirmEmail = 'Check your email to confirm your account, then sign in.';
   static const genericError = 'Something went wrong. Please try again.';
+  static const welcomeBack = 'Welcome back';
+  static const signInSubtitle = 'Sign in to keep scanning.';
+  static const createAccountSubtitle = '30 free scans, no card needed.';
+  static const newToRapscanz = 'New to RAPscanz? ';
+  static const createAnAccount = 'Create an account';
 
   // --- Scan result (PRD §7.4 section names) ---
   static const summaryTitle = 'Summary';
@@ -109,11 +114,52 @@ abstract final class Strings {
   static const scientificNameLabel = 'Scientific name';
   static String byParent(String company) => 'by $company';
 
+  // --- Gated result sections (PRD §7.4.6, 8, 10, 11) ---
+  static const dietaryTitle = 'Dietary classification';
+  static const consumptionTitle = 'Safe consumption guide';
+  static const safeDailyLabel = 'Safe per day';
+  static const upperLimitLabel = 'Upper limit';
+  static const sourceLabel = 'Source';
+  static const riskTitle = 'What over-consumption can cause';
+  static const riskIllnesses = 'Illnesses & conditions';
+  static const riskAddictions = 'Addiction patterns';
+  static const riskChronic = 'Chronic damage';
+  static const riskTemporary = 'Temporary effects';
+  static const riskOrgan = 'Organ-specific damage';
+  static const bodyMapTitle = 'Body-impact map';
+  static const bodyMapHarms = 'Harms';
+  static const bodyMapBenefits = 'Benefits';
+  static const bodyMapTapHint = 'Tap a highlighted organ for the reason.';
+  static const bodyMapListTitle = 'Organ details';
+  static String triggerLine(String trigger) => 'Trigger: $trigger';
+  static const proMaxFeature = 'Pro Max feature';
+  static const openBodyMap = 'Open body map';
+  static const bodyMapCardSubtitle = 'See which organs this product affects when eaten often.';
+  static String scannedBy(String type) => 'scanned by $type';
+  static const identifiedViaRegistry = 'Identified via AI Registry Lookup';
+
+  // --- Plans sheet (PRD §9, design.md §4.10) ---
+  static const plansTitle = 'Plans';
+  static const seePlans = 'See plans';
+  static String currentPlanLine(String label) => 'Your plan: $label';
+  static const currentPlanBadge = 'Current';
+  static String upgradeTo(String plan) => 'Upgrade to $plan';
+  static const unlimitedPlanNote = 'Your account has unlimited scans and every Pro Max feature.';
+
   // --- Scan input ---
   static const modeText = 'Text';
   static const modeBarcode = 'Barcode';
   static const barcodeLabel = 'Barcode number';
   static const barcodeHint = '8, 12, 13 or 14 digits';
+  static const scanSubtitle = "Find out what's actually in that packet.";
+  static const orTypeNumber = 'Or type the number';
+  static const barcodeHintExample = 'e.g. 8901058851234';
+  static const barcodeHelper =
+      'EAN-8, UPC-A, EAN-13 or ITF-14. In-store labels (prefix 20–29) are saved on your device and use no scan credit.';
+  static const scannerViewfinderHint = 'Align the barcode inside the frame';
+  static const toggleFlashlight = 'Toggle flashlight';
+  static const photoDropHint = 'Tap to take a photo or upload the food label';
+  static const quotaExhaustedTitle = "You've used all your scans";
   static const inStoreTitle = 'In-store item';
   static String inStoreBody(String code) =>
       'Barcode $code is a local/in-store code. It is not in global product databases and was not sent for analysis.';
@@ -150,13 +196,79 @@ abstract final class Strings {
   static const scanTypeBarcode = 'Barcode';
   static const offlineBanner = "You're offline — showing saved data.";
   static const backToHistory = 'Back to history';
+  static const scanResultTitle = 'Scan result';
   static const loadFailed = "Couldn't load this right now.";
+
+  // --- Weekly (PRD §7.7) ---
+  static const weeklyTotal = '7-day total';
+  static const weeklyAverage = 'Average per day';
+  static String kcal(int n) => '$n kcal';
+  static String kcalUnit(int n) => '$n';
+  static String avgPerDay(int n) => 'avg $n kcal/day';
+  static const deleteEntry = 'Delete entry';
+  static const entryRemoved = 'Removed';
+  static const scanSomething = 'Scan something';
+  static const runFirstScan = 'Run your first scan';
+  static const entriesTitle = 'Entries';
+  static const ateThisFailed = "Couldn't add this to your week. Please try again.";
+
+  // --- Leaderboard ---
+  static String scanCount(int n) => n == 1 ? '1 scan' : '$n scans';
+  static String averageScore(int n) => 'avg $n';
+
+  // --- Profile (PRD §7.9) ---
+  static const displayNameTitle = 'Display name';
+  static const usernameLabel = 'Username';
+  static const usernameHelp = 'Shown on the leaderboard as @username.';
+  static const healthInfoTitle = 'Health info';
+  static const healthInfoOptional = 'Optional and private.';
+  static const genderLabel = 'Gender';
+  static const ageLabel = 'Age';
+  static const weightLabel = 'Weight (kg)';
+  static const heightLabel = 'Height (cm)';
+  static const conditionsLabel = 'Conditions';
+  static const conditionsHint = 'e.g. diabetes, hypertension, PCOS, lactose intolerance';
+  static const allergiesLabel = 'Allergies';
+  static const allergiesHint = 'e.g. peanuts, gluten, soy';
+  static String bmiLine(String bmi) => 'BMI $bmi';
+  static const healthPrivacy =
+      'Stored privately. Never shown on the leaderboard. Used to personalise your scan advice.';
+  static const saveProfile = 'Save profile';
+  static const planTitle = 'Your plan';
+  static const usernameHelpShort = '3–20 characters. Shown on the public leaderboard.';
+  static const healthInfoHelp =
+      'Optional, but it helps tailor the advice on each scan. Stored privately and never shown on the leaderboard.';
+  static const upgrade = 'Upgrade';
+  static const planPriceLine = 'Pro ₹200 · Pro+ ₹500 · Pro Max ₹1,200 a month. Payments coming soon.';
+  static String planName(String label) => '$label plan';
+  static String scansLeftOf(int remaining, int limit) => '$remaining of $limit scans left';
+  static const unlimitedScans = 'Unlimited scans';
+  static const ageError = 'Age must be a whole number from 1 to 129.';
+  static const weightError = 'Weight must be more than 0 and less than 500 kg.';
+  static const heightError = 'Height must be more than 0 and less than 300 cm.';
+  static const freeTextTooLong = 'Keep this under 500 characters.';
+  static const profileSaveFailed = "Couldn't save your profile. Please try again.";
+
+  // --- Feedback (PRD §7.4.12) ---
+  static const feedbackTitle = 'Rate this product';
+  static const feedbackCommentLabel = 'Comment (optional)';
+  static const feedbackSubmit = 'Submit';
+  static const feedbackThanks = 'Thanks for your feedback!';
+  static const feedbackEdit = 'Edit';
+  static const feedbackNeedsAnswers = 'Pick a star rating and whether you would buy it again.';
+  static const feedbackFailed = "Couldn't save your feedback. Please try again.";
+  static String starsLabel(int n) => n == 1 ? '1 star' : '$n stars';
+  static const rateThisScan = 'Rate this scan';
+  static const addNoteOptional = 'Add a note (optional)';
+  static const sendFeedback = 'Send feedback';
+  static const feedbackNoteHint = 'Tasted great, but too salty for daily…';
 
   // --- Navigation ---
   static const navScan = 'Scan';
   static const navHistory = 'History';
   static const navWeekly = 'Weekly';
   static const navLeaderboard = 'Leaderboard';
+  static const navRanks = 'Ranks'; // tab label (handoff mockups)
   static const navProfile = 'Profile';
   static const signOut = 'Sign out';
   static const backHome = 'Back to home';

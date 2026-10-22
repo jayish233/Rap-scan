@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:learn/app/session.dart';
 import 'package:learn/app/theme.dart';
+import 'package:learn/data/feedback_repository.dart';
 import 'package:learn/data/history_repository.dart';
 import 'package:learn/data/local_barcodes_store.dart';
 import 'package:learn/data/photo_service.dart';
@@ -98,6 +99,7 @@ Future<MockScanApi> pumpScan(WidgetTester tester, {Quota? initialQuota}) async {
         quotaProvider.overrideWith((ref) async => initialQuota ?? quota()),
         historyProvider.overrideWith((ref) async => const Cached(<ScanSummary>[])),
         localBarcodesStoreProvider.overrideWithValue(localStore),
+        feedbackProvider.overrideWith((ref, id) async => null),
         photoServiceProvider.overrideWithValue(photos),
       ],
       child: MaterialApp(theme: buildAppTheme(), home: const ScanScreen()),
@@ -108,7 +110,10 @@ Future<MockScanApi> pumpScan(WidgetTester tester, {Quota? initialQuota}) async {
 }
 
 Future<void> tapScan(WidgetTester tester) async {
-  await tester.tap(find.text(Strings.scanButton));
+  final button = find.text(Strings.scanButton);
+  await tester.ensureVisible(button);
+  await tester.pumpAndSettle();
+  await tester.tap(button);
   await tester.pumpAndSettle();
 }
 
@@ -135,10 +140,10 @@ void main() {
     expect(request.toJson(), {'scanType': 'ingredients', 'text': 'sugar, wheat flour, palm oil'});
     expect(find.text(Strings.scanCompleteToast), findsOneWidget);
     expect(find.text('Chocolate cream biscuit'), findsOneWidget);
-    expect(find.text(Strings.ratingCaution), findsOneWidget);
-    expect(find.text('Bourbon · by Britannia Industries · Cream-filled biscuit'), findsOneWidget);
-    expect(find.text(Strings.caloriesLine(160)), findsOneWidget);
-    expect(find.text('You listed diabetes; keep this occasional.'), findsOneWidget);
+    expect(find.text(Strings.ratingCaution.toUpperCase()), findsOneWidget);
+    expect(find.textContaining('Bourbon · by Britannia Industries · Cream-filled biscuit'), findsOneWidget);
+    expect(find.textContaining('~160 kcal', findRichText: true), findsOneWidget);
+    expect(find.textContaining('You listed diabetes; keep this occasional.', findRichText: true), findsOneWidget);
     expect(find.text(Strings.cautionsTitle), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('Health score 31 out of 100, Eat rarely')), findsOneWidget);
     expect(find.text(Strings.disclaimer), findsOneWidget);
@@ -220,6 +225,7 @@ void main() {
     expect(find.text(Strings.localSavedCard), findsOneWidget);
 
     await tester.ensureVisible(find.text(Strings.localRemove));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(Strings.localRemove));
     await tester.pumpAndSettle();
     expect(localStore.items, isEmpty);
@@ -243,14 +249,21 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    /// The dashed drop area opens a sheet with the two source options.
+    Future<void> pickVia(WidgetTester tester, String option) async {
+      await tester.tap(find.text(Strings.photoDropHint));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(option));
+      await tester.pumpAndSettle();
+    }
+
     PickedPhoto photoOf(int bytes) => PickedPhoto(bytes: Uint8List(bytes), name: 'label.jpg');
 
     testWidgets('over 5 MB is rejected on device (PRD §14.7)', (tester) async {
       final api = await pumpScan(tester);
       await switchToPhoto(tester);
       photos.next = photoOf(maxPhotoBytes + 1);
-      await tester.tap(find.text(Strings.chooseFromLibrary));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.chooseFromLibrary);
       expect(find.text(Strings.oversizeImage), findsOneWidget);
       expect(find.byTooltip(Strings.removePhoto), findsNothing);
       verifyNever(() => api.analyze(any()));
@@ -265,15 +278,13 @@ void main() {
       expect(tester.widget<ButtonStyleButton>(button).onPressed, isNull);
 
       photos.next = photoOf(1024);
-      await tester.tap(find.text(Strings.takePhoto));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.takePhoto);
       expect(find.byTooltip(Strings.removePhoto), findsOneWidget);
       await tester.tap(find.byTooltip(Strings.removePhoto));
       await tester.pumpAndSettle();
       expect(find.byTooltip(Strings.removePhoto), findsNothing);
 
-      await tester.tap(find.text(Strings.takePhoto));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.takePhoto);
       await tapScan(tester);
       final request = verify(() => api.analyze(captureAny())).captured.single as ScanRequest;
       expect(request.toJson(), {'scanType': 'ingredients', 'imageDataUrl': 'data:image/jpeg;base64,QUJD'});
@@ -288,8 +299,7 @@ void main() {
       });
       await switchToPhoto(tester);
       photos.next = photoOf(1024);
-      await tester.tap(find.text(Strings.takePhoto));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.takePhoto);
       await tapScan(tester);
       expect(find.text(Strings.photoBarcodeToast), findsOneWidget);
     });
@@ -299,8 +309,7 @@ void main() {
       when(() => api.analyze(any())).thenThrow(const LocalBarcode('2000000123455', fromPhoto: true));
       await switchToPhoto(tester);
       photos.next = photoOf(1024);
-      await tester.tap(find.text(Strings.takePhoto));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.takePhoto);
       await tapScan(tester);
       expect(find.text(Strings.localBarcodeFromPhoto('2000000123455')), findsOneWidget);
       expect(find.text(Strings.localAddTitle), findsOneWidget);
@@ -310,8 +319,7 @@ void main() {
       await pumpScan(tester);
       await switchToPhoto(tester);
       photos.deny = true;
-      await tester.tap(find.text(Strings.takePhoto));
-      await tester.pumpAndSettle();
+      await pickVia(tester, Strings.takePhoto);
       expect(find.text(Strings.cameraDeniedTitle), findsOneWidget);
       await tester.tap(find.text(Strings.modeText));
       await tester.pumpAndSettle();

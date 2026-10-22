@@ -5,15 +5,23 @@ import 'package:flutter/material.dart';
 import '../../../app/theme.dart';
 import '../../../domain/rating.dart';
 
-/// Circular 0–100 score ring (design.md §7.1). The numeral scales down to
-/// fit, so large dynamic type never clips it. Exposes score + label to
-/// screen readers.
+/// Ring palette per score band (handoff spec §2): ≥70 green, 40–69 amber,
+/// <40 rose, each with its numeral tint.
+(Color progress, Color numeral) ringColors(int score) => switch (score) {
+      >= 70 => (AppColors.ringGood, AppColors.ringGoodText),
+      >= 40 => (AppColors.ringMid, AppColors.ringMidText),
+      _ => (AppColors.ringBad, AppColors.ringBadText),
+    };
+
+/// Health score ring (handoff spec §2): near-black disc (#0B1220), slate
+/// track, coloured progress arc, Bricolage numeral. Large 92 (stroke 9),
+/// small 56 (stroke 6). Exposes score + label to screen readers.
 class HealthScoreRing extends StatelessWidget {
-  const HealthScoreRing({super.key, required this.score, this.size = 112, this.showLabel = true});
+  const HealthScoreRing({super.key, required this.score, this.size = 92, this.showLabel = true});
 
   /// Small variant for history rows.
   const HealthScoreRing.small({super.key, required this.score})
-      : size = 40,
+      : size = 56,
         showLabel = false;
 
   final int score;
@@ -24,35 +32,40 @@ class HealthScoreRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = clampScore(score);
     final band = ScoreBand.of(s);
-    final color = toneColor(band.tone);
-    final text = Theme.of(context).textTheme;
-    final stroke = size * 0.09;
+    final (progress, numeral) = ringColors(s);
+    final stroke = size >= 92 ? 9.0 : 6.0;
 
-    final ring = SizedBox.square(
-      dimension: size,
+    final ring = Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(color: AppColors.ringDisc, shape: BoxShape.circle),
       child: CustomPaint(
-        painter: _RingPainter(fraction: s / 100, color: color, stroke: stroke),
+        painter: _RingPainter(fraction: s / 100, color: progress, stroke: stroke),
         child: Padding(
-          padding: EdgeInsets.all(stroke * 1.8),
+          padding: EdgeInsets.all(stroke + 4),
           child: FittedBox(
+            fit: BoxFit.scaleDown,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   '$s',
                   style: TextStyle(
                     fontFamily: AppFonts.display,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 40,
+                    fontWeight: FontWeight.w700,
+                    fontSize: size >= 92 ? 26 : 16,
                     height: 1,
-                    color: AppColors.text,
+                    letterSpacing: -0.5,
+                    color: numeral,
                   ),
                 ),
-                if (showLabel)
-                  Text(
-                    '${scoreOutOfTen(s)} / 10',
-                    style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+                if (size >= 92) ...[
+                  const SizedBox(height: 2),
+                  const Text(
+                    '/ 100',
+                    style: TextStyle(fontFamily: AppFonts.body, fontSize: 9, letterSpacing: 0.7, color: AppColors.ringSubtext),
                   ),
+                ],
               ],
             ),
           ),
@@ -70,11 +83,11 @@ class HealthScoreRing extends StatelessWidget {
                 ring,
                 const SizedBox(height: 6),
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: size * 1.4),
+                  constraints: BoxConstraints(maxWidth: size * 1.5),
                   child: Text(
                     band.label,
                     textAlign: TextAlign.center,
-                    style: text.labelLarge?.copyWith(color: color, fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontFamily: AppFonts.body, fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.text),
                   ),
                 ),
               ],
@@ -93,7 +106,7 @@ class _RingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = (Offset.zero & size).deflate(stroke / 2);
+    final rect = (Offset.zero & size).deflate(stroke / 2 + 1);
     canvas.drawArc(
       rect,
       0,
@@ -102,7 +115,7 @@ class _RingPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke
-        ..color = color.withValues(alpha: 0.15),
+        ..color = AppColors.ringTrack,
     );
     if (fraction <= 0) return;
     canvas.drawArc(

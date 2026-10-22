@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iOS Leaderboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FAFDFA; color: #1D242B; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="flex-grow: 1; min-height: 0; box-sizing: border-box; padding: 60px 20px 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 700">Leaderboard</h1>
+<p style="margin: 6px 0 0; font-size: 14px; line-height: 1.4; color: #5C6670">Top users by average health score<br>(minimum 3 scans).</p>
+</div>
+<div style="width: 48px; height: 48px; border-radius: 14px; background: #72D66F; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#14301F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: #F2C94C; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800">1</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@greens_only</div><div style="font-size: 12px; color: #5C6670">41 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">92</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: #C9D1D6; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800">2</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@oat_queen</div><div style="font-size: 12px; color: #5C6670">28 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">89</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: #E0A66B; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800">3</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@labelreader</div><div style="font-size: 12px; color: #5C6670">63 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">86</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #5C6670">4</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@snackwise</div><div style="font-size: 12px; color: #5C6670">19 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">83</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #5C6670">5</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@fit_farhan</div><div style="font-size: 12px; color: #5C6670">34 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">81</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #5C6670">6</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@dal_chawal</div><div style="font-size: 12px; color: #5C6670">22 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">78</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #5C6670">7</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@mindful_munch</div><div style="font-size: 12px; color: #5C6670">12 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">76</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; color: #5C6670">8</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@tiffin_tales</div><div style="font-size: 12px; color: #5C6670">17 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">74</div>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px; border-radius: 16px; background: #E4F6E3; border: 2px solid #1B7746; box-shadow: 4px 4px 0 0 #72D66F">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: #1B7746; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px; font-weight: 800">14</div>
+<div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">@you_name <span style="font-weight: 600; color: #1B7746">· You</span></div><div style="font-size: 12px; color: #3F4A52">9 scans</div></div>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; color: #1B7746">71</div>
+</div>
+</div>
+
+<nav style="display: flex; justify-content: space-around; padding: 8px 8px 30px; background: #FFFFFF; border-top: 1px solid #E3EBE5; flex-shrink: 0">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scan</a>
+<a href="ios-history.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>History</a>
+<a href="ios-weekly.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>Weekly</a>
+<a href="ios-ranks.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #1B7746; font-size: 10px; font-weight: 700">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Ranks</a>
+<a href="ios-profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -8,27 +8,23 @@ import 'package:integration_test/integration_test.dart';
 import 'package:learn/l10n/strings.dart';
 import 'package:learn/main.dart' as app;
 
-Future<void> pumpUntil(WidgetTester tester, Finder finder, {Duration timeout = const Duration(seconds: 20)}) async {
-  final end = DateTime.now().add(timeout);
-  while (DateTime.now().isBefore(end)) {
-    await tester.pump(const Duration(milliseconds: 200));
-    if (finder.evaluate().isNotEmpty) return;
-  }
-  throw TestFailure('Timed out waiting for $finder');
-}
+import 'gate_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('sign up → Scan with Free · 30 of 30; sign out → Home; public pages reachable', (tester) async {
     await app.main();
-    await tester.pump(const Duration(seconds: 1)); // splash hold
-
-    // A session persisted by an earlier run would skip Home; sign out first.
+    // Past the splash: Home (signed out) or the tab shell (session kept).
+    await pumpUntil(
+      tester,
+      find.byWidgetPredicate((w) => w is NavigationBar || (w is Text && w.data == Strings.positioningLine)),
+    );
+    await tester.pumpAndSettle();
     if (find.byType(NavigationBar).evaluate().isNotEmpty) {
       await tester.tap(find.text(Strings.navProfile));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(Strings.signOut));
+      await tapVisible(tester, find.text(Strings.signOut));
     }
     await pumpUntil(tester, find.text(Strings.positioningLine));
 
@@ -56,7 +52,7 @@ void main() {
     // Sign out from Profile → Home.
     await tester.tap(find.text(Strings.navProfile));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(Strings.signOut));
+    await tapVisible(tester, find.text(Strings.signOut));
     await pumpUntil(tester, find.text(Strings.positioningLine));
     expect(find.byType(NavigationBar), findsNothing);
 

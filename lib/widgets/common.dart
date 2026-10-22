@@ -41,7 +41,7 @@ class HardOffsetCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSizes.radius),
         border: Border.all(color: AppColors.primary, width: 1.5),
         boxShadow: const [
-          BoxShadow(color: AppColors.primary, offset: AppSizes.hardShadowOffset, blurRadius: 0),
+          BoxShadow(color: AppColors.accent, offset: AppSizes.hardShadowOffset, blurRadius: 0),
         ],
       ),
       padding: const EdgeInsets.all(16),

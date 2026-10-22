@@ -55,16 +55,22 @@ class PlanCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+            // Wraps onto two lines at large text sizes instead of overflowing.
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 4,
               children: [
-                Expanded(child: Text(tier.label, style: text.titleLarge)),
-                if (isCurrent)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8),
-                    child: Chip(label: Text('Current'), visualDensity: VisualDensity.compact),
-                  ),
+                Wrap(
+                  spacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(tier.label, style: text.titleLarge),
+                    if (isCurrent)
+                      const Chip(label: Text(Strings.currentPlanBadge), visualDensity: VisualDensity.compact),
+                  ],
+                ),
                 Text(
                   tier.price,
                   style: text.titleLarge?.copyWith(fontFamily: AppFonts.display, color: AppColors.primary),

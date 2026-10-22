@@ -48,6 +48,18 @@ Future<void> launchSignedIn(WidgetTester tester) async {
   await pumpUntil(tester, find.textContaining('scans left'));
 }
 
+/// From Home (signed out): create [email] and land on the Scan tab.
+Future<void> launchSignedInAs(WidgetTester tester, String email) async {
+  await tester.tap(find.text(Strings.homeCta));
+  await pumpUntil(tester, find.text(Strings.needAccount));
+  await tester.tap(find.text(Strings.needAccount));
+  await tester.pumpAndSettle();
+  await tester.enterText(find.widgetWithText(TextFormField, Strings.email), email);
+  await tester.enterText(find.widgetWithText(TextFormField, Strings.password), 'gate-pass-123');
+  await tapVisible(tester, find.widgetWithText(FilledButton, Strings.createAccount));
+  await pumpUntil(tester, find.textContaining('scans left'));
+}
+
 /// The quota chip text currently shown.
 String chipText(WidgetTester tester) =>
     find.textContaining('scans left').evaluate().map((e) => (e.widget as Text).data!).first;

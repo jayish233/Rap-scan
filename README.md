@@ -29,11 +29,13 @@ lib/
   app/         # router (auth gate), theme, session
   domain/      # pure Dart: barcode check digits, plan gating, rating, scan result
   data/        # Supabase client, DTOs, repositories, local stores
-  features/    # auth, home, scan (+ result), history, content, shell, splash
+  features/    # auth, home, scan (+ result, local inventory), history, weekly,
+               # leaderboard, profile, plans, content, shell, splash
   l10n/        # English strings (verbatim copy from design.md)
   widgets/     # shared brand/common widgets
 supabase/
-  migrations/  # 0001–0005: tables, RLS, leaderboard/quota functions, plan-column protection
+  migrations/  # 0001–0006: tables, RLS, leaderboard/quota functions, plan-column
+               # protection, consumption filled from the scan row
   functions/analyze-scan/  # scan pipeline + organ rules + tests (Deno)
   tests/       # database tests (pgTAP)
 ```
@@ -59,6 +61,7 @@ supabase/
    supabase db push        # apply migrations
    ```
    Note the `API URL` and `anon key` printed by `supabase start` (or `supabase status`).
+   Local ports are shifted to **553xx** (API `http://127.0.0.1:55321`) in `supabase/config.toml`.
 
 3. **Configure the Gemini key** (never commit it, never ship it in the app)
    ```bash
@@ -76,8 +79,11 @@ supabase/
 5. **Run the app**
    ```bash
    flutter run \
-     --dart-define=SUPABASE_URL=http://localhost:54321 \
+     --dart-define=SUPABASE_URL=http://127.0.0.1:55321 \
      --dart-define=SUPABASE_ANON_KEY=<anon key from supabase status>
+   # or keep them in a git-ignored file (see config/example.json):
+   flutter run --dart-define-from-file=config/local.json           # iOS simulator
+   flutter run --dart-define-from-file=config/local.android.json   # Android emulator (10.0.2.2)
    ```
    Without these dart-defines the app boots into a "config missing" screen by design.
 
@@ -85,11 +91,26 @@ supabase/
 
 ```bash
 flutter analyze                          # lint — must stay clean
-flutter test                             # unit + widget tests
+flutter test                             # unit, widget + accessibility tests
 deno test supabase/functions/analyze-scan/   # edge-function tests
 supabase test db                         # database (pgTAP) tests
 bash supabase/scripts/phase0_gate.sh     # backend acceptance gate: registry identity, cache consistency, credit rules
 ```
+
+### On-device acceptance gates (PRD §14)
+
+Run against a booted simulator (`xcrun simctl list devices`) with the local backend and edge function serving.
+
+| Gate | Command | Needs live Gemini |
+| --- | --- | --- |
+| Sign-up → Scan, sign-out, public pages (§14.1, §14.14) | `flutter test integration_test/phase1_gate_test.dart --dart-define-from-file=config/local.json -d <id>` | no |
+| Text + barcode scans, cache, no-credit validation, history (§14.2–5) | `flutter test integration_test/phase2_gate_test.dart …` | yes |
+| Photo → barcode / image analysis, > 5 MB rejected (§14.7) | `flutter test integration_test/phase3_gate_test.dart …` | yes |
+| In-store code, no credit, survives restart (§14.6) | `tool/phase3_restart_gate.sh <id>` | no |
+| Plan gating, expired plan, unlimited role (§14.11–12) | `tool/phase4_gate.sh <id>` | no |
+| Profile, weekly, leaderboard, feedback (§14.8–10, §14.13) | `flutter test integration_test/phase5_gate_test.dart …` | no |
+
+`flutter test` uninstalls the app when it finishes (wiping its storage), so the restart gate uses `flutter drive --keep-app-running`.
 
 ## Plans & gating
 

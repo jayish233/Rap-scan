@@ -3,26 +3,77 @@ import 'package:flutter/material.dart';
 import '../../../app/theme.dart';
 import '../../../domain/rating.dart';
 import '../../../domain/scan_result.dart';
+import '../../../widgets/adaptive.dart';
 
-/// Rating label + colour, never colour alone (design.md §7.3).
+/// Small rating pill (history rows on Android). Tinted background, dark
+/// text, never colour alone (design.md §7.3).
 class RatingChip extends StatelessWidget {
   const RatingChip({super.key, required this.rating});
 
   final Rating rating;
 
   @override
-  Widget build(BuildContext context) => LabelChip(label: rating.label, color: toneColor(rating.tone), semanticPrefix: 'Rating');
+  Widget build(BuildContext context) {
+    final (bg, fg) = ratingChipColors(rating);
+    return Semantics(
+      label: 'Rating: ${rating.label}',
+      excludeSemantics: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+        child: Text(
+          rating.label,
+          style: TextStyle(fontFamily: AppFonts.body, fontSize: 11, fontWeight: FontWeight.w700, color: fg),
+        ),
+      ),
+    );
+  }
 }
 
-/// Severity word + colour (design.md §7.3).
+(Color bg, Color fg) ratingChipColors(Rating rating) => switch (rating.tone) {
+      Tone.success => (AppColors.tonal, AppColors.onTonal),
+      Tone.accent => (const Color(0xFFE3F4D8), const Color(0xFF1F4A12)),
+      Tone.warning => (AppColors.amberTintStrong, AppColors.cautionText),
+      _ => (const Color(0xFFF8D7D3), const Color(0xFF7A1A12)),
+    };
+
+/// Banner colours for the verdict header: background = rating colour, text
+/// dark on warning/accent, dark green on success (spec §2).
+(Color bg, Color fg) ratingBannerColors(Rating? rating) => switch (rating?.tone) {
+      Tone.success => (AppColors.success, AppColors.onTonal),
+      Tone.accent => (AppColors.accent, AppColors.onAccent),
+      Tone.warning => (AppColors.warning, AppColors.text),
+      Tone.danger || Tone.rose => (AppColors.danger, AppColors.onPrimary),
+      null => (AppColors.surfaceMuted, AppColors.text),
+    };
+
+/// Severity chip (cautions list): low = grey, medium = amber, high = red.
+/// The word is always shown, never colour alone.
 class SeverityChip extends StatelessWidget {
   const SeverityChip({super.key, required this.severity});
 
   final Severity severity;
 
   @override
-  Widget build(BuildContext context) =>
-      LabelChip(label: severity.label, color: severityColor(severity), semanticPrefix: 'Severity');
+  Widget build(BuildContext context) {
+    final (bg, fg) = switch (severity) {
+      Severity.low => (AppColors.severityChipLowBg, AppColors.severityChipLowText),
+      Severity.medium => (AppColors.warning, AppColors.text),
+      Severity.high => (AppColors.danger, AppColors.onPrimary),
+    };
+    return Semantics(
+      label: 'Severity: ${severity.label}',
+      excludeSemantics: true,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: isIos(context) ? 3 : 4),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(isIos(context) ? 999 : 8)),
+        child: Text(
+          severity.label,
+          style: TextStyle(fontFamily: AppFonts.body, fontSize: 12, fontWeight: FontWeight.w700, color: fg),
+        ),
+      ),
+    );
+  }
 }
 
 class LabelChip extends StatelessWidget {
@@ -49,12 +100,11 @@ class LabelChip extends StatelessWidget {
           children: [
             Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w700,
-                  ),
+            Flexible(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.text, fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),
@@ -63,7 +113,7 @@ class LabelChip extends StatelessWidget {
   }
 }
 
-/// Titled result block.
+/// Titled result block (legacy layout for sections not yet card-based).
 class ResultSection extends StatelessWidget {
   const ResultSection({super.key, required this.title, this.icon, this.iconColor, required this.child});
 
@@ -87,7 +137,7 @@ class ResultSection extends StatelessWidget {
                   Icon(icon, size: 20, color: iconColor ?? AppColors.primary),
                   const SizedBox(width: 8),
                 ],
-                Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+                Expanded(child: Text(title, style: Theme.of(context).textTheme.titleMedium)),
               ],
             ),
           ),
@@ -99,30 +149,40 @@ class ResultSection extends StatelessWidget {
   }
 }
 
+/// Advantages (+ green) / disadvantages (− red) markers (mockups §4.3).
 class BulletList extends StatelessWidget {
-  const BulletList({super.key, required this.items, required this.emptyText, required this.color});
+  const BulletList({super.key, required this.items, required this.emptyText, required this.color, this.marker});
 
   final List<String> items;
   final String emptyText;
   final Color color;
 
+  /// Marker glyph ("+" / "−"); a small dot when null.
+  final String? marker;
+
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyMedium;
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4);
     if (items.isEmpty) return Text(emptyText, style: style?.copyWith(color: AppColors.textMuted));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (final item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 7, right: 8),
-                  child: Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-                ),
+                if (marker != null)
+                  SizedBox(
+                    width: 16,
+                    child: Text(marker!, style: TextStyle(fontFamily: AppFonts.body, fontSize: 14, fontWeight: FontWeight.w700, color: color, height: 1.4)),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(top: 7, right: 8),
+                    child: Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+                  ),
                 Expanded(child: Text(item, style: style)),
               ],
             ),

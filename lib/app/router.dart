@@ -7,10 +7,12 @@ import '../features/content/trust_screen.dart';
 import '../features/history/history_detail_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/leaderboard/leaderboard_screen.dart';
+import '../features/profile/profile_screen.dart';
 import '../features/scan/scan_screen.dart';
 import '../features/shell/app_shell.dart';
-import '../features/shell/tab_placeholders.dart';
 import '../features/splash/splash_screen.dart';
+import '../features/weekly/weekly_screen.dart';
 import 'routes.dart';
 import 'session.dart';
 
@@ -43,11 +45,11 @@ GoRouter buildRouter(SessionState session, {String initialLocation = Routes.spla
               ),
             ],
           ),
-          StatefulShellBranch(routes: [GoRoute(path: Routes.weekly, builder: (_, _) => const WeeklyPlaceholder())]),
+          StatefulShellBranch(routes: [GoRoute(path: Routes.weekly, builder: (_, _) => const WeeklyScreen())]),
           StatefulShellBranch(
-            routes: [GoRoute(path: Routes.leaderboard, builder: (_, _) => const LeaderboardPlaceholder())],
+            routes: [GoRoute(path: Routes.leaderboard, builder: (_, _) => const LeaderboardScreen())],
           ),
-          StatefulShellBranch(routes: [GoRoute(path: Routes.profile, builder: (_, _) => const ProfilePlaceholder())]),
+          StatefulShellBranch(routes: [GoRoute(path: Routes.profile, builder: (_, _) => const ProfileScreen())]),
         ],
       ),
     ],

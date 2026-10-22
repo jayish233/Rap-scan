@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iOS Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #FAFDFA; color: #1D242B; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="flex-grow: 1; min-height: 0; box-sizing: border-box; padding: 76px 24px 0; display: flex; flex-direction: column; gap: 22px">
+
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="44" height="44" viewBox="0 0 64 64" fill="none" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3FD68A"/><stop offset="1" stop-color="#19C8C0"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg)"/><g stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"><path d="M14 22V16H20"/><path d="M50 22V16H44"/><path d="M14 42V48H20"/><path d="M50 42V48H44"/></g><path d="M22 40C22 29 29 23 43 22 43 36 35 42 24 41Z" fill="#FFFFFF"/><path d="M22 42 31 33" stroke="#19A97A" stroke-width="2.4" stroke-linecap="round"/></svg>
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.035em">RAP<span style="color: #1B7746">scanz</span></div>
+</div>
+
+<div>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 700">Welcome back</h1>
+<p style="margin: 8px 0 0; font-size: 15px; color: #5C6670">Sign in to keep scanning.</p>
+</div>
+
+<div style="display: flex; padding: 3px; border-radius: 11px; background: #E8EFEA; height: 44px; box-sizing: border-box">
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; font-weight: 700; color: #1D242B; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.14), 0 0 0 0.5px rgba(0,0,0,0.05)">Sign in</div>
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; font-weight: 600; color: #5C6670">Create account</div>
+</div>
+
+<div style="border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5; box-shadow: 5px 5px 0 0 #72D66F">
+<div style="display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px; border-bottom: 1px solid #E3EBE5">
+<label for="em" style="width: 76px; font-size: 15px; font-weight: 600">Email</label>
+<input id="em" type="email" value="you@example.com" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+<div style="display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px">
+<label for="pw" style="width: 76px; font-size: 15px; font-weight: 600">Password</label>
+<input id="pw" type="password" value="password1" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; margin-top: 4px">
+<a href="Main.dc.html" style="height: 54px; border-radius: 16px; background: #1B7746; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Sign in</a>
+<div style="text-align: center; font-size: 14px; color: #5C6670">New to RAPscanz? <span style="color: #1B7746; font-weight: 700">Create an account</span></div>
+</div>
+</div>
+
+<div style="padding: 0 32px 44px; text-align: center; font-size: 12px; line-height: 1.5; color: #5C6670">30 free scans, no card needed.<br>For information only — not medical advice.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

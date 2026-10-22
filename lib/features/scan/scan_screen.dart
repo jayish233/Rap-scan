@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +8,13 @@ import '../../data/local_barcodes_store.dart';
 import '../../data/profile_repository.dart';
 import '../../domain/scan_result.dart';
 import '../../l10n/strings.dart';
-import '../../widgets/brand.dart';
+import '../../widgets/adaptive.dart';
 import '../../widgets/common.dart';
+import '../plans/plans_sheet.dart';
 import 'local/local_inventory.dart';
 import 'result/scan_result_view.dart';
 import 'scan_controller.dart';
-import 'widgets/barcode_scanner_page.dart';
+import 'widgets/barcode_viewfinder.dart';
 import 'widgets/camera_denied_notice.dart';
 import 'widgets/laser_scan_animation.dart';
 import 'widgets/photo_panel.dart';
@@ -20,8 +22,9 @@ import 'widgets/quota_chip.dart';
 
 const _maxTextChars = 10000;
 
-/// Scan tab (PRD §7.3, design.md §4.4): plan chip, three input modes, one
-/// primary button, the running animation, local inventory and the result.
+/// Scan tab (handoff spec §4.2, mockups Main/android-scan): title + plan
+/// chip, Text | Photo | Barcode selector, inline live viewfinder, one
+/// primary button, local inventory and the result.
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
 
@@ -57,20 +60,11 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     }
   }
 
-  /// Live scanner fills the field and submits (PRD §7.3).
-  Future<void> _openScanner() async {
-    FocusScope.of(context).unfocus();
-    final result = await BarcodeScannerPage.open(context);
-    if (!mounted) return;
-    switch (result) {
-      case ScannedCode(:final code):
-        _barcode.text = code;
-        _controller.submitBarcode(code);
-      case ScannerDenied():
-        _controller.markCameraDenied();
-      case null:
-        break;
-    }
+  /// Live viewfinder fills the field and submits (PRD §7.3).
+  void _onViewfinderCode(String code) {
+    if (ref.read(scanControllerProvider).busy) return;
+    _barcode.text = code;
+    _controller.submitBarcode(code);
   }
 
   void _scrollTo(GlobalKey key) {
@@ -124,43 +118,44 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     final quota = ref.watch(quotaProvider).value;
     final exhausted = quota?.isExhausted ?? false;
     final canSubmit = !scan.busy && !exhausted && (scan.mode != ScanMode.photo || scan.photo != null);
+    final ios = isIos(context);
 
     return Scaffold(
-      appBar: AppBar(title: const BrandLockup(), centerTitle: false),
       body: SafeArea(
-        top: false,
         child: ListView(
           controller: _scroll,
           padding: const EdgeInsets.only(bottom: 24),
           children: [
             ContentWidth(
+              padding: EdgeInsets.symmetric(horizontal: ios ? 24 : 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 8),
-                  const Align(alignment: Alignment.centerLeft, child: QuotaChip()),
+                  SizedBox(height: ios ? 12 : 0),
+                  ScreenHeader(
+                    title: Strings.navScan,
+                    subtitle: ios ? Strings.scanSubtitle : null,
+                    trailing: const Padding(padding: EdgeInsets.only(bottom: 4), child: QuotaChip()),
+                  ),
                   if (exhausted) ...[
                     const SizedBox(height: 12),
-                    const _InlineCard(icon: Icons.lock_outline, color: AppColors.warning, body: Strings.quotaExhausted),
+                    _InlineCard(
+                      icon: Icons.lock_outline,
+                      color: AppColors.warning,
+                      title: Strings.quotaExhaustedTitle,
+                      body: Strings.quotaExhausted,
+                      action: TextButton(onPressed: () => showPlansSheet(context), child: const Text(Strings.seePlans)),
+                    ),
                   ],
                   const SizedBox(height: 16),
-                  SegmentedButton<ScanMode>(
-                    segments: const [
-                      ButtonSegment(value: ScanMode.text, icon: Icon(Icons.notes), label: Text(Strings.modeText)),
-                      ButtonSegment(
-                        value: ScanMode.photo,
-                        icon: Icon(Icons.photo_camera_outlined),
-                        label: Text(Strings.modePhoto),
-                      ),
-                      ButtonSegment(
-                        value: ScanMode.barcode,
-                        icon: Icon(Icons.qr_code_2),
-                        label: Text(Strings.modeBarcode),
-                      ),
+                  AppSegmented<ScanMode>(
+                    options: const [
+                      (ScanMode.text, Strings.modeText, Icons.description_outlined),
+                      (ScanMode.photo, Strings.modePhoto, Icons.photo_camera_outlined),
+                      (ScanMode.barcode, Strings.modeBarcode, CupertinoIcons.barcode),
                     ],
-                    selected: {scan.mode},
-                    showSelectedIcon: false,
-                    onSelectionChanged: scan.busy ? null : (s) => _controller.setMode(s.first),
+                    selected: scan.mode,
+                    onChanged: scan.busy ? null : _controller.setMode,
                   ),
                   const SizedBox(height: 16),
                   ...switch (scan.mode) {
@@ -171,12 +166,12 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                           key: const ValueKey('scan-text-field'),
                           controller: _text,
                           enabled: !scan.busy,
-                          minLines: 6,
+                          minLines: ios ? 7 : 6,
                           maxLines: 12,
                           maxLength: _maxTextChars,
                           maxLengthEnforcement: MaxLengthEnforcement.enforced,
                           keyboardType: TextInputType.multiline,
-                          decoration: const InputDecoration(hintText: Strings.textPlaceholder, alignLabelWithHint: true),
+                          decoration: appInputDecoration(context, hint: Strings.textPlaceholder),
                           // Only show the counter when approaching the server cap.
                           buildCounter: (context, {required currentLength, required isFocused, maxLength}) =>
                               currentLength > _maxTextChars * 0.9 ? Text('$currentLength / $maxLength') : null,
@@ -193,6 +188,13 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                       ],
                     ScanMode.barcode => [
                         if (scan.cameraDenied) ...[const CameraDeniedNotice(), const SizedBox(height: 12)],
+                        BarcodeViewfinder(
+                          onCode: _onViewfinderCode,
+                          onDenied: _controller.markCameraDenied,
+                          paused: scan.busy,
+                        ),
+                        const SizedBox(height: 16),
+                        const FieldCaption(label: Strings.orTypeNumber),
                         TextField(
                           key: const ValueKey('scan-barcode-field'),
                           controller: _barcode,
@@ -204,26 +206,22 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(14),
                           ],
-                          decoration: const InputDecoration(
-                            labelText: Strings.barcodeLabel,
-                            hintText: Strings.barcodeHint,
-                            prefixIcon: Icon(Icons.qr_code_2),
+                          decoration: appInputDecoration(
+                            context,
+                            label: Strings.barcodeLabel,
+                            hint: Strings.barcodeHintExample,
+                            prefixIcon: CupertinoIcons.barcode,
                           ),
                           onSubmitted: (_) => _submit(),
                         ),
-                        const SizedBox(height: 8),
-                        OutlinedButton.icon(
-                          onPressed: scan.busy ? null : _openScanner,
-                          icon: const Icon(Icons.qr_code_scanner),
-                          label: const Text(Strings.scanWithCamera),
-                        ),
+                        const FieldHelper(text: Strings.barcodeHelper),
                       ],
                   },
                   const SizedBox(height: 16),
-                  FilledButton.icon(
+                  AppPrimaryButton(
+                    label: Strings.scanButton,
+                    icon: Icons.document_scanner_outlined,
                     onPressed: canSubmit ? _submit : null,
-                    icon: const Icon(Icons.document_scanner_outlined),
-                    label: const Text(Strings.scanButton),
                   ),
                   if (scan.busy) ...[
                     const SizedBox(height: 16),
@@ -236,25 +234,30 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                   ],
                   if (scan.outcome != null && !scan.busy) ...[
                     const SizedBox(height: 24),
-                    const Divider(),
-                    const SizedBox(height: 8),
                     KeyedSubtree(
                       key: _resultKey,
                       child: ScanResultView(
                         result: scan.outcome!.result,
                         scanId: scan.outcome!.scanId,
                         access: scan.outcome!.quota.access,
+                        scanType: switch (scan.outcome!.source) {
+                          ScanSource.barcode || ScanSource.photoBarcode => Strings.scanTypeBarcode,
+                          _ => Strings.scanTypeIngredients,
+                        },
                       ),
                     ),
-                    TextButton.icon(
-                      onPressed: () {
-                        _text.clear();
-                        _barcode.clear();
-                        _controller.clearResult();
-                        _scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-                      },
-                      icon: const Icon(Icons.refresh),
-                      label: const Text(Strings.startOver),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () {
+                          _text.clear();
+                          _barcode.clear();
+                          _controller.clearResult();
+                          _scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text(Strings.startOver),
+                      ),
                     ),
                   ] else
                     const DisclaimerFooter(),
@@ -270,21 +273,24 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
 /// Inline warning/notice card (PRD §12: quota and local-barcode notices).
 class _InlineCard extends StatelessWidget {
-  const _InlineCard({required this.icon, required this.color, required this.body});
+  const _InlineCard({required this.icon, required this.color, required this.title, required this.body, this.action});
 
   final IconData icon;
   final Color color;
+  final String title;
   final String body;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
     return Semantics(
       liveRegion: true,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.circular(AppSizes.radius),
+          borderRadius: BorderRadius.circular(cardRadius(context)),
           border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(
@@ -292,7 +298,17 @@ class _InlineCard extends StatelessWidget {
           children: [
             Icon(icon, color: color),
             const SizedBox(width: 10),
-            Expanded(child: Text(body, style: Theme.of(context).textTheme.bodyMedium)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text(body, style: text.bodySmall?.copyWith(height: 1.45)),
+                  ?action,
+                ],
+              ),
+            ),
           ],
         ),
       ),

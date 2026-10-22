@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iOS Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 1180px; box-sizing: border-box; display: flex; flex-direction: column; background: #FAFDFA; color: #1D242B; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="flex-grow: 1; min-height: 0; box-sizing: border-box; padding: 60px 20px 24px; display: flex; flex-direction: column; gap: 14px">
+
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 700">Profile</h1>
+
+<div>
+<div style="padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5C6670">DISPLAY NAME</div>
+<div style="border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px">
+<label for="un" style="font-size: 15px; font-weight: 600">Username</label>
+<span style="margin-left: auto; color: #5C6670">@</span>
+<input id="un" type="text" value="you_name" maxlength="20" style="width: 140px; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+</div>
+<div style="padding: 6px 4px 0; font-size: 12px; color: #5C6670">3–20 characters. Shown on the public leaderboard.</div>
+</div>
+
+<div style="border-radius: 20px; background: #FFFFFF; border: 1px solid #E3EBE5; padding: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.03em">Free plan</div>
+<div style="font-size: 13px; font-weight: 600; color: #5C6670">24 of 30 scans left</div>
+</div>
+<div style="margin-top: 10px; height: 8px; border-radius: 4px; background: #E8EFEA"><div style="width: 80%; height: 8px; border-radius: 4px; background: #1B7746"></div></div>
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 12px">
+<button style="height: 44px; padding: 0 20px; border-radius: 12px; border: 0; background: #72D66F; color: #14301F; font-family: inherit; font-size: 15px; font-weight: 700; flex-shrink: 0">Upgrade</button>
+<div style="font-size: 12px; line-height: 1.4; color: #5C6670">Pro ₹200 · Pro+ ₹500 · Pro Max ₹1,200 a month. Payments coming soon.</div>
+</div>
+</div>
+
+<div>
+<div style="padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5C6670; display: flex; align-items: center; gap: 6px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D13A2E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>HEALTH INFO</div>
+<div style="border-radius: 16px; background: #FFFFFF; border: 1px solid #E3EBE5">
+<div style="display: flex; align-items: center; height: 52px; padding: 0 16px; border-bottom: 1px solid #E3EBE5">
+<span style="font-size: 15px; font-weight: 600">Gender</span>
+<button style="margin-left: auto; display: flex; align-items: center; gap: 2px; min-height: 44px; border: 0; background: transparent; font-family: inherit; font-size: 15px; color: #5C6670">Prefer not to say<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+</div>
+<div style="display: flex; align-items: center; height: 52px; padding: 0 16px; border-bottom: 1px solid #E3EBE5">
+<label for="ag" style="font-size: 15px; font-weight: 600">Age</label>
+<input id="ag" type="text" inputmode="numeric" value="28" style="margin-left: auto; width: 90px; border: 0; outline: 0; background: transparent; text-align: right; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+<div style="display: flex; align-items: center; height: 52px; padding: 0 16px; border-bottom: 1px solid #E3EBE5">
+<label for="wt" style="font-size: 15px; font-weight: 600">Weight (kg)</label>
+<input id="wt" type="text" inputmode="decimal" value="68.5" style="margin-left: auto; width: 90px; border: 0; outline: 0; background: transparent; text-align: right; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+<div style="display: flex; align-items: center; height: 52px; padding: 0 16px; border-bottom: 1px solid #E3EBE5">
+<label for="ht" style="font-size: 15px; font-weight: 600">Height (cm)</label>
+<input id="ht" type="text" inputmode="decimal" value="172" style="margin-left: auto; width: 90px; border: 0; outline: 0; background: transparent; text-align: right; font-family: inherit; font-size: 16px; color: #1D242B">
+</div>
+<div style="display: flex; align-items: center; height: 48px; padding: 0 16px">
+<span style="font-size: 15px; font-weight: 600; color: #5C6670">BMI</span>
+<span style="margin-left: auto; font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700">23.2</span>
+</div>
+</div>
+<div style="padding: 6px 4px 0; font-size: 12px; line-height: 1.4; color: #5C6670">Optional, but it helps tailor the advice on each scan. Stored privately and never shown on the leaderboard.</div>
+</div>
+
+<div>
+<label for="il" style="display: block; padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5C6670">CONDITIONS / ILLNESSES</label>
+<textarea id="il" rows="2" maxlength="500" placeholder="e.g. diabetes, hypertension, PCOS, lactose intolerance" style="width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 16px; border: 1px solid #E3EBE5; background: #FFFFFF; font-family: inherit; font-size: 15px; resize: none"></textarea>
+</div>
+
+<div>
+<label for="al" style="display: block; padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #5C6670">ALLERGIES</label>
+<textarea id="al" rows="2" maxlength="500" placeholder="e.g. peanuts, gluten, soy" style="width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 16px; border: 1px solid #E3EBE5; background: #FFFFFF; font-family: inherit; font-size: 15px; resize: none"></textarea>
+</div>
+
+<button style="height: 54px; border-radius: 16px; border: 0; background: #1B7746; color: #FFFFFF; font-family: inherit; font-size: 17px; font-weight: 700">Save profile</button>
+<button style="height: 48px; border: 0; background: transparent; color: #D13A2E; font-family: inherit; font-size: 16px; font-weight: 600">Sign out</button>
+</div>
+
+<nav style="display: flex; justify-content: space-around; padding: 8px 8px 30px; background: #FFFFFF; border-top: 1px solid #E3EBE5; flex-shrink: 0">
+<a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>Scan</a>
+<a href="ios-history.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>History</a>
+<a href="ios-weekly.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>Weekly</a>
+<a href="ios-ranks.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #5C6670; font-size: 10px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Ranks</a>
+<a href="ios-profile.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 64px; min-height: 44px; text-decoration: none; color: #1B7746; font-size: 10px; font-weight: 700">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

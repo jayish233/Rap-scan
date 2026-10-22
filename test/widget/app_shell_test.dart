@@ -9,7 +9,11 @@ import 'package:learn/app/routes.dart';
 import 'package:learn/app/session.dart';
 import 'package:learn/app/theme.dart';
 import 'package:learn/data/auth_repository.dart';
+import 'package:learn/data/history_repository.dart';
+import 'package:learn/data/leaderboard_repository.dart';
 import 'package:learn/data/profile_repository.dart';
+import 'package:learn/domain/leaderboard.dart';
+import 'package:learn/domain/profile.dart';
 import 'package:learn/domain/plan.dart';
 import 'package:learn/l10n/strings.dart';
 import 'package:mocktail/mocktail.dart';
@@ -42,6 +46,8 @@ Future<({GoRouter router, StreamController<String?> auth, _MockAuthRepository re
         currentUserIdProvider.overrideWith((ref) => ref.watch(sessionStateProvider).userId),
         authRepositoryProvider.overrideWithValue(repo),
         quotaProvider.overrideWith((ref) async => _freeQuota),
+        leaderboardProvider.overrideWith((ref) async => const <LeaderboardEntry>[]),
+        profileProvider.overrideWith((ref) async => const Cached(Profile(id: 'u1', email: 'a@example.com'))),
       ],
       child: MaterialApp.router(theme: buildAppTheme(), routerConfig: router),
     ),
@@ -71,6 +77,8 @@ void main() {
 
   testWidgets('sign-out from Profile returns to Home (PRD §7.1)', (tester) async {
     final app = await pumpApp(tester, initialLocation: Routes.profile, userId: 'u1');
+    await tester.ensureVisible(find.text(Strings.signOut));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(Strings.signOut));
     await tester.pumpAndSettle();
     verify(app.repo.signOut).called(1);
