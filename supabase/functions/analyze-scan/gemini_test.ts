@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects } from "jsr:@std/assert@1";
-import { GeminiModel, ModelError } from "./gemini.ts";
+import { GeminiModel, isQuotaExhausted, ModelError } from "./gemini.ts";
 
 function reply(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -25,11 +25,11 @@ Deno.test("retries transient 503 overloads, then succeeds", async () => {
 });
 
 Deno.test("gives up after the retry budget with ai_unavailable", async () => {
-  const f = fakeFetch([503, 503, 503, 200]);
-  const model = new GeminiModel("k", f.impl, [0, 0]);
+  const f = fakeFetch([503, 503, 503, 503, 200]);
+  const model = new GeminiModel("k", f.impl, [0, 0, 0]);
   const e = await assertRejects(() => model.personalAdvice("s", undefined, "x"), ModelError);
   assertEquals(e.code, "ai_unavailable");
-  assertEquals(f.calls.length, 3);
+  assertEquals(f.calls.length, 4);
 });
 
 Deno.test("does not retry rate limits or client errors", async () => {
@@ -40,4 +40,23 @@ Deno.test("does not retry rate limits or client errors", async () => {
     assertEquals(e.code, code);
     assertEquals(f.calls.length, 1);
   }
+});
+
+Deno.test("429 with an exhausted daily/free-tier quota → ai_credits_exhausted", async () => {
+  const body = {
+    error: {
+      code: 429,
+      message: "You exceeded your current quota, please check your plan and billing details.",
+      details: [{ "@type": "type.googleapis.com/google.rpc.RetryInfo", retryDelay: "79440s" }],
+    },
+  };
+  const impl = (() => Promise.resolve(reply(429, body))) as typeof fetch;
+  const e = await assertRejects(() => new GeminiModel("k", impl, []).personalAdvice("s", undefined, "x"), ModelError);
+  assertEquals(e.code, "ai_credits_exhausted");
+});
+
+Deno.test("isQuotaExhausted: short bursts are plain rate limits", () => {
+  assertEquals(isQuotaExhausted('{"error":{"message":"Resource exhausted","details":[{"retryDelay":"7s"}]}}'), false);
+  assertEquals(isQuotaExhausted('{"error":{"message":"Quota exceeded for metric: generate_content_free_tier_requests"}}'), true);
+  assertEquals(isQuotaExhausted('{"error":{"details":[{"retryDelay":"3600s"}]}}'), true);
 });

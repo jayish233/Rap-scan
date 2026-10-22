@@ -74,6 +74,20 @@ final class LocalBarcode extends ScanFailure {
   String get message => Strings.localBarcodeFromPhoto(code);
 }
 
+/// Picked photo is over 5 MB; rejected on device, never uploaded.
+final class PhotoTooLarge extends ScanFailure {
+  const PhotoTooLarge();
+  @override
+  String get message => Strings.oversizeImage;
+}
+
+/// Camera / photo-library permission denied (design.md §8).
+final class CameraDenied extends ScanFailure {
+  const CameraDenied();
+  @override
+  String get message => Strings.cameraDeniedToast;
+}
+
 final class NetworkDown extends ScanFailure {
   const NetworkDown();
   @override

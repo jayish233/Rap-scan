@@ -118,6 +118,32 @@ abstract final class Strings {
   static String inStoreBody(String code) =>
       'Barcode $code is a local/in-store code. It is not in global product databases and was not sent for analysis.';
   static const startOver = 'New scan';
+  static const modePhoto = 'Photo';
+  static const takePhoto = 'Take photo';
+  static const chooseFromLibrary = 'Choose from library';
+  static const removePhoto = 'Remove photo';
+  static const photoHint = 'Photograph the ingredient list or the barcode on the pack.';
+  static const scanWithCamera = 'Scan with camera';
+  static const scannerTitle = 'Point at the barcode';
+  static const scannerHint = 'EAN-8, EAN-13, UPC-A or ITF-14';
+  static const close = 'Close';
+  static const cameraDeniedTitle = 'Camera access is off';
+  static const cameraDeniedBody =
+      'To scan with the camera, open Settings › RAPscanz and turn on Camera (and Photos to pick from your library). '
+      'You can still paste the ingredients or type the barcode number.';
+  static const cameraDeniedToast = 'Camera access is off. You can still paste ingredients or type the barcode.';
+
+  // --- Local / in-store inventory (PRD §7.5) ---
+  static const localAddTitle = 'Save in-store item';
+  static const localAddButton = 'Add to this device';
+  static const localNameLabel = 'Item name';
+  static const localNameRequired = 'Enter the item name.';
+  static const localPriceLabel = 'Price (optional)';
+  static const localWeightLabel = 'Weight / size (optional)';
+  static const localRemove = 'Remove from this device';
+  static const save = 'Save';
+  static const cancel = 'Cancel';
+  static String barcodeLine(String code) => 'Barcode $code';
 
   // --- History ---
   static const scanTypeIngredients = 'Ingredients';

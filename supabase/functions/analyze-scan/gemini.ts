@@ -56,7 +56,7 @@ export class GeminiModel implements AnalysisModel {
     private fetchImpl: typeof fetch = fetch,
     // The credit is already spent when the model is called, so ride out
     // short overloads instead of failing the user's scan.
-    private retryDelaysMs: number[] = [1000, 2500],
+    private retryDelaysMs: number[] = [1500, 4000, 8000],
   ) {}
 
   analyzeIngredients(text: string, ctx: string) {
@@ -138,7 +138,11 @@ export class GeminiModel implements AnalysisModel {
 
     if (!res.ok) {
       const detail = await res.text().catch(() => "");
-      if (res.status === 429) throw new ModelError("rate_limited", detail);
+      if (res.status === 429) {
+        // A burst limit clears in seconds; an exhausted daily/billing quota
+        // does not, and needs the app owner (design.md §10 copy).
+        throw new ModelError(isQuotaExhausted(detail) ? "ai_credits_exhausted" : "rate_limited", detail);
+      }
       if (res.status === 402) throw new ModelError("ai_credits_exhausted", detail);
       const error = new ModelError("ai_unavailable", `HTTP ${res.status}: ${detail.slice(0, 500)}`);
       throw RETRYABLE.has(res.status) ? new RetryableError(error) : error;
@@ -156,6 +160,13 @@ export class GeminiModel implements AnalysisModel {
     }
     throw new ModelError("ai_unavailable", "model returned non-JSON output");
   }
+}
+
+/** True when a 429 body describes a quota that will not reset soon. */
+export function isQuotaExhausted(body: string): boolean {
+  if (/billing|PerDay|per day|free_tier/i.test(body)) return true;
+  const delay = /"retryDelay"\s*:\s*"(\d+)(?:\.\d+)?s"/.exec(body);
+  return delay !== null && Number(delay[1]) > 120;
 }
 
 class RetryableError extends Error {
