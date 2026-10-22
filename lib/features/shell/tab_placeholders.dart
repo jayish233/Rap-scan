@@ -9,7 +9,7 @@ import '../../l10n/strings.dart';
 import '../../widgets/common.dart';
 
 // Placeholder tabs for the Phase 1 shell. Each is replaced by its feature
-// screen in a later phase (History: 2, Weekly/Leaderboard/Profile: 5).
+// screen in a later phase (Weekly/Leaderboard/Profile: Phase 5).
 
 class _TabPage extends StatelessWidget {
   const _TabPage({required this.title, this.subtitle, this.leading, this.children = const []});
@@ -38,14 +38,6 @@ class _TabPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class HistoryPlaceholder extends StatelessWidget {
-  const HistoryPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) =>
-      const _TabPage(title: Strings.historyTitle, subtitle: Strings.historySubtitle);
 }
 
 class WeeklyPlaceholder extends StatelessWidget {

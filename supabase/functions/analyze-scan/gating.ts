@@ -37,6 +37,14 @@ function str(value: unknown): string | undefined {
   return trimmed === "" ? undefined : trimmed;
 }
 
+// Model placeholders that must never be shown as a real brand or owner.
+const PLACEHOLDER = /^(unknown|unidentified|generic|n\/?a|none|not (stated|specified|available|provided))\b/i;
+
+function identity(value: unknown): string | undefined {
+  const s = str(value);
+  return s && !PLACEHOLDER.test(s) ? s : undefined;
+}
+
 function strList(value: unknown, max = 8): string[] {
   if (!Array.isArray(value)) return [];
   return value.map(str).filter((s): s is string => !!s).slice(0, max);
@@ -99,8 +107,8 @@ export function normaliseResult(raw: Record<string, unknown>): ScanResult {
 
   return {
     productName: str(raw.productName) ?? "Unidentified product",
-    ...(str(raw.brand) ? { brand: str(raw.brand) } : {}),
-    ...(str(raw.parentCompany) ? { parentCompany: str(raw.parentCompany) } : {}),
+    ...(identity(raw.brand) ? { brand: identity(raw.brand) } : {}),
+    ...(identity(raw.parentCompany) ? { parentCompany: identity(raw.parentCompany) } : {}),
     ...(str(raw.category) ? { category: str(raw.category) } : {}),
     rating,
     healthScore,

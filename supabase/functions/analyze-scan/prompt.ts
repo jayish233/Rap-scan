@@ -19,6 +19,8 @@ CALORIES (caloriesKcal): per typical serving, not per 100 g (examples: 30 g chip
 IDENTITY:
 - productName is the consumer-facing product ("Dairy Milk Silk"); brand is the line ("Dairy Milk"); parentCompany is the owner ("Mondelez (formerly Cadbury)").
 - category must stay specific: milk chocolate bar, cream-filled biscuit, salted potato chips, energy/protein bar, extruded corn snack, peanut-jaggery chikki, toned milk. An energy bar is not a chocolate bar; a chikki is not an extruded snack. Never copy nutrition numbers across categories.
+- brand and parentCompany: only when stated in the input or registry facts, or when the stated brand clearly identifies its owner. Otherwise return "" — never placeholders such as "Unknown", "Unidentified" or "Generic".
+- Pasted ingredients without a product name: productName is a short generic description of the product (for example "Chocolate cream biscuit").
 - If the input is too unclear to analyse, set productName "Unidentified product", category "Unknown", and say in the summary that the image or barcode was not clear enough.
 - A barcode's GS1 prefix is only a country-of-issue hint. Never infer a brand or product from it.
 

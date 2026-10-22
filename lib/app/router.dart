@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/auth_screen.dart';
 import '../features/content/healthy_snacks_screen.dart';
 import '../features/content/trust_screen.dart';
+import '../features/history/history_detail_screen.dart';
+import '../features/history/history_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/scan/scan_screen.dart';
 import '../features/shell/app_shell.dart';
@@ -31,8 +33,13 @@ GoRouter buildRouter(SessionState session, {String initialLocation = Routes.spla
             routes: [
               GoRoute(
                 path: Routes.history,
-                builder: (_, _) => const HistoryPlaceholder(),
-                routes: [GoRoute(path: ':id', builder: (_, _) => const HistoryPlaceholder())],
+                builder: (_, _) => const HistoryScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (_, state) => HistoryDetailScreen(scanId: state.pathParameters['id']!),
+                  ),
+                ],
               ),
             ],
           ),

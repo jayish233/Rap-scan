@@ -47,8 +47,17 @@ export function parseDataUrl(dataUrl: string): Image | null {
   return match ? { mimeType: match[1].toLowerCase(), base64: match[2].replace(/\s/g, "") } : null;
 }
 
+/** Transient upstream failures worth retrying (overload, gateway hiccups). */
+const RETRYABLE = new Set([500, 502, 503, 504]);
+
 export class GeminiModel implements AnalysisModel {
-  constructor(private apiKey: string, private fetchImpl: typeof fetch = fetch) {}
+  constructor(
+    private apiKey: string,
+    private fetchImpl: typeof fetch = fetch,
+    // The credit is already spent when the model is called, so ride out
+    // short overloads instead of failing the user's scan.
+    private retryDelaysMs: number[] = [1000, 2500],
+  ) {}
 
   analyzeIngredients(text: string, ctx: string) {
     return this.generate([{ text: ingredientsPrompt(text, ctx) }], RESULT_SCHEMA);
@@ -85,6 +94,24 @@ export class GeminiModel implements AnalysisModel {
     schema: unknown,
     withSystem = true,
   ): Promise<Record<string, unknown>> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.generateOnce(parts, schema, withSystem);
+      } catch (e) {
+        const delay = this.retryDelaysMs[attempt];
+        if (!(e instanceof RetryableError) || delay === undefined) {
+          throw e instanceof RetryableError ? e.cause : e;
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  private async generateOnce(
+    parts: unknown[],
+    schema: unknown,
+    withSystem: boolean,
+  ): Promise<Record<string, unknown>> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     let res: Response;
@@ -113,7 +140,8 @@ export class GeminiModel implements AnalysisModel {
       const detail = await res.text().catch(() => "");
       if (res.status === 429) throw new ModelError("rate_limited", detail);
       if (res.status === 402) throw new ModelError("ai_credits_exhausted", detail);
-      throw new ModelError("ai_unavailable", `HTTP ${res.status}: ${detail.slice(0, 500)}`);
+      const error = new ModelError("ai_unavailable", `HTTP ${res.status}: ${detail.slice(0, 500)}`);
+      throw RETRYABLE.has(res.status) ? new RetryableError(error) : error;
     }
 
     const body = await res.json().catch(() => null) as
@@ -127,6 +155,12 @@ export class GeminiModel implements AnalysisModel {
       // fall through
     }
     throw new ModelError("ai_unavailable", "model returned non-JSON output");
+  }
+}
+
+class RetryableError extends Error {
+  constructor(override readonly cause: ModelError) {
+    super(cause.message);
   }
 }
 

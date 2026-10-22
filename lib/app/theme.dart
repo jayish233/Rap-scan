@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../domain/rating.dart';
+import '../domain/scan_result.dart';
+
 /// Colour tokens (design.md §2.1). Every semantic colour in the app maps to
 /// one of these — never a raw hex in a widget.
 abstract final class AppColors {
@@ -166,3 +169,19 @@ ThemeData buildAppTheme() {
     dividerTheme: const DividerThemeData(color: AppColors.border, space: 1),
   );
 }
+
+/// Semantic tone → colour token (rating chips, score ring).
+Color toneColor(Tone tone) => switch (tone) {
+      Tone.success => AppColors.success,
+      Tone.accent => AppColors.accent,
+      Tone.warning => AppColors.warning,
+      Tone.danger => AppColors.danger,
+      Tone.rose => AppColors.rose,
+    };
+
+/// Caution / organ-harm severity colour.
+Color severityColor(Severity severity) => switch (severity) {
+      Severity.low => AppColors.severityLow,
+      Severity.medium => AppColors.severityMedium,
+      Severity.high => AppColors.severityHigh,
+    };

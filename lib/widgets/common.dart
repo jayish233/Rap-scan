@@ -112,3 +112,48 @@ void showToast(BuildContext context, String message, {bool error = false}) {
       ),
     );
 }
+
+/// Shown when a screen is rendering cached data while offline.
+class OfflineBanner extends StatelessWidget {
+  const OfflineBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: AppColors.surfaceMuted, borderRadius: BorderRadius.circular(AppSizes.radius)),
+      child: Row(
+        children: [
+          const Icon(Icons.cloud_off, size: 18, color: AppColors.textMuted),
+          const SizedBox(width: 8),
+          Expanded(child: Text(Strings.offlineBanner, style: Theme.of(context).textTheme.bodySmall)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Load error with a retry action.
+class ErrorState extends StatelessWidget {
+  const ErrorState({super.key, required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      child: Column(
+        children: [
+          const Icon(Icons.wifi_off, size: 48, color: AppColors.textMuted),
+          const SizedBox(height: 12),
+          Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          OutlinedButton(onPressed: onRetry, child: const Text(Strings.retry)),
+        ],
+      ),
+    );
+  }
+}

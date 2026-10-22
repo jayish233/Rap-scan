@@ -66,4 +66,63 @@ class Quota {
   final bool isUnlimited;
 
   bool get isExhausted => !isUnlimited && remaining <= 0;
+
+  FeatureAccess get access => FeatureAccess.of(plan: plan, isUnlimited: isUnlimited);
+}
+
+/// A paid plan whose expiry is in the past behaves as Free (PRD §8, §15).
+/// The server already applies this; the client re-applies it to any plan
+/// it reads from a profile row so a stale row never unlocks features.
+String effectivePlan({required String plan, DateTime? planExpiresAt, required DateTime now}) {
+  if (plan != 'free' && planExpiresAt != null && planExpiresAt.isBefore(now)) return 'free';
+  return plan;
+}
+
+/// Pro Max features: `plan == pro_max` OR `isUnlimited` OR `plan == unlimited`.
+bool isProMax({required String plan, required bool isUnlimited}) =>
+    plan == 'pro_max' || plan == 'unlimited' || isUnlimited;
+
+/// Which gated result sections the caller may see (PRD §8 matrix). The UI
+/// hides anything not allowed even if a stale payload contains it.
+class FeatureAccess {
+  const FeatureAccess._({
+    required this.cautionPercentage,
+    required this.chemicalDetail,
+    required this.consumptionGuide,
+    required this.riskProfile,
+    required this.dietary,
+    required this.bodyMap,
+  });
+
+  factory FeatureAccess.of({required String plan, required bool isUnlimited}) {
+    final proMax = isProMax(plan: plan, isUnlimited: isUnlimited);
+    final proPlus = proMax || plan == 'pro_plus';
+    return FeatureAccess._(
+      cautionPercentage: proPlus,
+      chemicalDetail: proPlus,
+      consumptionGuide: proPlus,
+      riskProfile: proMax,
+      dietary: proMax,
+      bodyMap: proMax,
+    );
+  }
+
+  static const free = FeatureAccess._(
+    cautionPercentage: false,
+    chemicalDetail: false,
+    consumptionGuide: false,
+    riskProfile: false,
+    dietary: false,
+    bodyMap: false,
+  );
+
+  /// `percentage` as its own field (Pro shows it inside the concern text).
+  final bool cautionPercentage;
+
+  /// Chemical formula and scientific name.
+  final bool chemicalDetail;
+  final bool consumptionGuide;
+  final bool riskProfile;
+  final bool dietary;
+  final bool bodyMap;
 }

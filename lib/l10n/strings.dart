@@ -97,6 +97,35 @@ abstract final class Strings {
   static const confirmEmail = 'Check your email to confirm your account, then sign in.';
   static const genericError = 'Something went wrong. Please try again.';
 
+  // --- Scan result (PRD §7.4 section names) ---
+  static const summaryTitle = 'Summary';
+  static const forYouTitle = 'For you';
+  static const caloriesTitle = 'Calories';
+  static const ateThis = 'I ate this';
+  static const advantagesTitle = 'Advantages';
+  static const disadvantagesTitle = 'Disadvantages';
+  static const cautionsTitle = 'Chemical & ingredient cautions';
+  static const formulaLabel = 'Formula';
+  static const scientificNameLabel = 'Scientific name';
+  static String byParent(String company) => 'by $company';
+
+  // --- Scan input ---
+  static const modeText = 'Text';
+  static const modeBarcode = 'Barcode';
+  static const barcodeLabel = 'Barcode number';
+  static const barcodeHint = '8, 12, 13 or 14 digits';
+  static const inStoreTitle = 'In-store item';
+  static String inStoreBody(String code) =>
+      'Barcode $code is a local/in-store code. It is not in global product databases and was not sent for analysis.';
+  static const startOver = 'New scan';
+
+  // --- History ---
+  static const scanTypeIngredients = 'Ingredients';
+  static const scanTypeBarcode = 'Barcode';
+  static const offlineBanner = "You're offline — showing saved data.";
+  static const backToHistory = 'Back to history';
+  static const loadFailed = "Couldn't load this right now.";
+
   // --- Navigation ---
   static const navScan = 'Scan';
   static const navHistory = 'History';

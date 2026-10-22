@@ -93,3 +93,10 @@ Deno.test("normalise: risk profile emptied for healthy products", () => {
 Deno.test("cache entries never carry personal advice", () => {
   assertEquals("personalAdvice" in withoutPersonalAdvice(FULL), false);
 });
+
+Deno.test("normalise: placeholder brand/owner from the model are dropped", () => {
+  const r = normaliseResult({ productName: "Unidentified product", brand: "Unidentified product", parentCompany: "Unknown company", category: "Unknown" });
+  assertEquals("brand" in r, false);
+  assertEquals("parentCompany" in r, false);
+  assertEquals(normaliseResult({ brand: "Britannia", parentCompany: "Britannia Industries" }).brand, "Britannia");
+});
