@@ -60,3 +60,11 @@ Deno.test("isQuotaExhausted: short bursts are plain rate limits", () => {
   assertEquals(isQuotaExhausted('{"error":{"message":"Quota exceeded for metric: generate_content_free_tier_requests"}}'), true);
   assertEquals(isQuotaExhausted('{"error":{"details":[{"retryDelay":"3600s"}]}}'), true);
 });
+
+Deno.test("falls back to next model when primary model free-tier quota is exhausted", async () => {
+  const f = fakeFetch([429, 200]);
+  const model = new GeminiModel("k", f.impl, [], ["gemini-2.5-flash", "gemini-2.5-flash-lite"]);
+  assertEquals(await model.personalAdvice("s", undefined, "Allergies: peanuts"), "ok");
+  assertEquals(f.calls, [429, 200]);
+});
+

@@ -13,8 +13,14 @@ import {
 import type { RegistryProduct } from "./types.ts";
 
 const MODEL = "gemini-2.5-flash";
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 const TIMEOUT_MS = 60_000;
+
+export const DEFAULT_FALLBACK_MODELS = [
+  "gemini-2.5-flash-lite",
+  "gemini-2.5-flash",
+  "gemini-3.1-flash-lite",
+];
 
 export type ModelErrorCode = "rate_limited" | "ai_unavailable" | "ai_credits_exhausted";
 
@@ -57,6 +63,8 @@ export class GeminiModel implements AnalysisModel {
     // The credit is already spent when the model is called, so ride out
     // short overloads instead of failing the user's scan.
     private retryDelaysMs: number[] = [1500, 4000, 8000],
+    // Try fallback models when a model's free-tier quota is exhausted.
+    private models: string[] = [MODEL],
   ) {}
 
   analyzeIngredients(text: string, ctx: string) {
@@ -94,9 +102,26 @@ export class GeminiModel implements AnalysisModel {
     schema: unknown,
     withSystem = true,
   ): Promise<Record<string, unknown>> {
+    let lastError: unknown;
+    for (const model of this.models) {
+      try {
+        return await this.generateWithModel(model, parts, schema, withSystem);
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    throw lastError;
+  }
+
+  private async generateWithModel(
+    model: string,
+    parts: unknown[],
+    schema: unknown,
+    withSystem: boolean,
+  ): Promise<Record<string, unknown>> {
     for (let attempt = 0; ; attempt++) {
       try {
-        return await this.generateOnce(parts, schema, withSystem);
+        return await this.generateOnce(model, parts, schema, withSystem);
       } catch (e) {
         const delay = this.retryDelaysMs[attempt];
         if (!(e instanceof RetryableError) || delay === undefined) {
@@ -108,6 +133,7 @@ export class GeminiModel implements AnalysisModel {
   }
 
   private async generateOnce(
+    model: string,
     parts: unknown[],
     schema: unknown,
     withSystem: boolean,
@@ -116,7 +142,7 @@ export class GeminiModel implements AnalysisModel {
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     let res: Response;
     try {
-      res = await this.fetchImpl(ENDPOINT, {
+      res = await this.fetchImpl(`${BASE_URL}/${model}:generateContent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": this.apiKey },
         signal: controller.signal,

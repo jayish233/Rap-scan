@@ -2,7 +2,7 @@
 // the food registries and Gemini. Secrets come only from the function env.
 
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { GeminiModel } from "./gemini.ts";
+import { DEFAULT_FALLBACK_MODELS, GeminiModel } from "./gemini.ts";
 import { MESSAGES } from "./messages.ts";
 import { type CachedAnalysis, type Deps, runScan, type Store } from "./pipeline.ts";
 import { lookupOpenFoodFacts, lookupUpcItemDb } from "./registries.ts";
@@ -98,7 +98,7 @@ const store: Store = {
 const deps: Deps = {
   store,
   registries: { openFoodFacts: lookupOpenFoodFacts, upcItemDb: lookupUpcItemDb },
-  model: new GeminiModel(env("GEMINI_API_KEY")),
+  model: new GeminiModel(env("GEMINI_API_KEY"), fetch, [1500, 4000, 8000], DEFAULT_FALLBACK_MODELS),
   // Never log ingredient text, photos or health fields (PRD §13).
   log: (message, extra) => console.error(JSON.stringify({ message, ...extra })),
 };
